@@ -1,0 +1,196 @@
+[
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc_static.dir/src/V4l2Access.cc.o",
+            "../src/V4l2Access.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2Access.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-Dlibv4l2cc_EXPORTS",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-fPIC",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc.dir/src/V4l2Capture.cc.o",
+            "../src/V4l2Capture.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2Capture.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-Dlibv4l2cc_EXPORTS",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-fPIC",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc.dir/src/V4l2MmapDevice.cc.o",
+            "../src/V4l2MmapDevice.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2MmapDevice.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc_static.dir/src/V4l2Device.cc.o",
+            "../src/V4l2Device.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2Device.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc_static.dir/src/V4l2Capture.cc.o",
+            "../src/V4l2Capture.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2Capture.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-Dlibv4l2cc_EXPORTS",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-fPIC",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc.dir/src/V4l2Access.cc.o",
+            "../src/V4l2Access.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2Access.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc_test.dir/test/test.cc.o",
+            "../test/test.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../test/test.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-Dlibv4l2cc_EXPORTS",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-fPIC",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc.dir/src/log.cc.o",
+            "../src/log.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/log.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-Dlibv4l2cc_EXPORTS",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-fPIC",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc.dir/src/V4l2ReadWriteDevice.cc.o",
+            "../src/V4l2ReadWriteDevice.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2ReadWriteDevice.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc_static.dir/src/V4l2MmapDevice.cc.o",
+            "../src/V4l2MmapDevice.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2MmapDevice.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc_static.dir/src/V4l2ReadWriteDevice.cc.o",
+            "../src/V4l2ReadWriteDevice.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2ReadWriteDevice.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc_static.dir/src/log.cc.o",
+            "../src/log.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/log.cc"
+    },
+    {
+        "arguments": [
+            "/usr/bin/c++",
+            "-c",
+            "-Dlibv4l2cc_EXPORTS",
+            "-I/home/ubuntu/share/Vdev/libv4l2cc/inc",
+            "-g",
+            "-fPIC",
+            "-std=gnu++11",
+            "-o",
+            "CMakeFiles/libv4l2cc.dir/src/V4l2Device.cc.o",
+            "../src/V4l2Device.cc"
+        ],
+        "directory": "/home/ubuntu/share/Vdev/libv4l2cc/build",
+        "file": "../src/V4l2Device.cc"
+    }
+]
