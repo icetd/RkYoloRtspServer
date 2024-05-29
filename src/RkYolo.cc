@@ -19,7 +19,7 @@ RkYolo::~RkYolo()
     Destroy();
 }
 
-int RkYolo::Init()
+int RkYolo::Init(rknn_core_mask mask)
 {   
     int ret = -1;
     FILE *fp;
@@ -56,6 +56,13 @@ int RkYolo::Init()
         return -1;
     }
     
+    m_core_mask = mask;
+    ret = rknn_set_core_mask(m_rknn_ctx, m_core_mask);
+    if (ret < 0) {
+        LOG(ERROR, "rknn_init core error ret=%d\n", ret);
+        return -1;
+    }
+
     // get rknn version
     ret = rknn_query(m_rknn_ctx, RKNN_QUERY_SDK_VERSION, &m_version, sizeof(rknn_sdk_version));
     if (ret < 0) {
@@ -92,12 +99,12 @@ int RkYolo::Init()
 
     // set rknn input params
     if (m_input_attrs[0].fmt == RKNN_TENSOR_NCHW) {
-        LOG(NOTICE, "model is NCHW input fmt");
+        LOG(NOTICE, "model is NCHW input fmt npu_core:%d", m_core_mask >> 1);
         m_config.model_channel = m_input_attrs[0].dims[1];
         m_config.model_height = m_input_attrs[0].dims[2];
         m_config.model_width = m_input_attrs[0].dims[3];
     } else {
-        LOG(NOTICE, "model is NHWC input fmt");
+        LOG(NOTICE, "model is NHWC input fmt npu_core:%d", m_core_mask >> 1);
         m_config.model_height = m_input_attrs[0].dims[1];
         m_config.model_width = m_input_attrs[0].dims[2];
         m_config.model_channel = m_input_attrs[0].dims[3];
@@ -112,10 +119,11 @@ int RkYolo::Init()
     return ret;
 }
 
-int RkYolo::Inference(uint8_t *inbuf, uint8_t *outbuf, int in_width, int in_height)
+
+int RkYolo::Inference(int in_width, int in_height)
 {
     int ret = -1;
-    cv::Mat yuvImage(in_height, in_width, CV_8UC2, (void*)inbuf);
+    cv::Mat yuvImage(in_height, in_width, CV_8UC2, (void*)m_inbuf);
     cv::Mat ori_img;
     cvtColor(yuvImage, ori_img, cv::COLOR_YUV2RGB_YUY2);  // Use COLOR_YUV2BGR_YUY2 for YUYV format
     
@@ -193,7 +201,7 @@ int RkYolo::Inference(uint8_t *inbuf, uint8_t *outbuf, int in_width, int in_heig
     cv::Mat yuv_img;
     cv::cvtColor(resized_img, yuv_img, cv::COLOR_RGB2YUV_I420);
 
-    memcpy(outbuf, yuv_img.data, in_width * in_height * 3 / 2);
+    memcpy(m_outbuf, yuv_img.data, in_width * in_height * 3 / 2);
 
     ret = rknn_outputs_release(m_rknn_ctx, m_io_num.n_output, outputs);
 
