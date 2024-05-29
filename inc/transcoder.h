@@ -11,6 +11,7 @@
 #include "V4l2Capture.h"
 #include "RkEncoder.h"
 #include "RkYolo.h"
+#include "ThreadPool.h"
 
 class TransCoder : public MThread
 {
@@ -20,6 +21,7 @@ public:
         int height;
         int fps;
         int fix_qp;
+        int rknn_thread;
         std::string device_name;
     } Config_t;
 
@@ -42,7 +44,12 @@ private:
     std::function<void(std::vector<uint8_t> &&)> onEncodedDataCallback;
 
 	RkEncoder *rk_encoder;
-    RkYolo *m_rkyolo;
+    std::vector<RkYolo*> m_rkyolo_list;
+    ThreadPool *m_pool;   
+    int m_cur_yolo;
+
+    std::vector<std::vector<uint8_t>> m_in_buffer_list;
+    std::vector<std::vector<uint8_t>> m_out_buffer_list;
 };
 
 

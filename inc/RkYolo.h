@@ -17,8 +17,12 @@ public:
     RkYolo();
     ~RkYolo();
 
-    int Init();
-    int Inference(uint8_t *inbuf, uint8_t *outbuf, int width, int height);
+    int Init(rknn_core_mask mask);
+    int Inference(int width, int height);
+    void SetBuffers(uint8_t* inbuf, uint8_t* out_buf) {
+        m_inbuf = inbuf;
+        m_outbuf = out_buf;
+    }
 
 private:
     rknn_context m_rknn_ctx;
@@ -28,9 +32,13 @@ private:
     rknn_sdk_version m_version;
     rknn_input m_input;
     uint8_t *m_model_data;
-
+ 
+    uint8_t* m_inbuf;
+    uint8_t* m_outbuf;
+ 
     Config_t m_config;
-    
+    rknn_core_mask m_core_mask;
+
     void Destroy();
 };
 
