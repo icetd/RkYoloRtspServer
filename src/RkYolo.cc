@@ -171,6 +171,8 @@ int RkYolo::Inference(int in_width, int in_height)
     // post process
     const float nms_threshold = NMS_THRESH;
     const float box_conf_threshold = BOX_THRESH;
+    BOX_RECT pads;
+    memset(&pads, 0, sizeof(BOX_RECT));
     float scale_w = (float)m_config.model_width / in_width;
     float scale_h = (float)m_config.model_height / in_height;
 
@@ -182,7 +184,7 @@ int RkYolo::Inference(int in_width, int in_height)
         out_zps.push_back(m_output_attrs[i].zp);
     }
     post_process((int8_t *)outputs[0].buf, (int8_t *)outputs[1].buf, (int8_t *)outputs[2].buf, m_config.model_height, m_config.model_width,
-                 box_conf_threshold, nms_threshold, scale_w, scale_h, out_zps, out_scales, &detect_result_group);
+                 box_conf_threshold, nms_threshold, pads, scale_w, scale_h, out_zps, out_scales, &detect_result_group);
 
     // Draw Objects
     char text[256];
