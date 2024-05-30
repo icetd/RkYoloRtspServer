@@ -73,3 +73,10 @@ bitrate = 1440
 ## demo
 
 ![](pic/demo.png)
+
+## tags Notes
+```
+v1.0.0 -- single npu && corresponds to rktoolkit 1.5.0 or below
+v1.1.0 -- multiple npu && corresponds to rktoolkit 1.5.0 or below
+v1.2.0 -- multiple npu && corresponds to rktoolkit 1.5.2 or up
+```
