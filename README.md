@@ -49,6 +49,7 @@ bitrate = 1440
 - mutiple npu
 
 ## resource utilization
+- yolov5s
 
 ```
 1 -- NPU load:  Core0: 38%, Core1:  0%, Core2:  0%,
@@ -58,6 +59,18 @@ bitrate = 1440
 5 -- NPU load:  Core0: 20%, Core1: 20%, Core2: 10%,
 6 -- NPU load:  Core0: 16%, Core1: 17%, Core2: 17%,
 ```
+
+- yolov5m
+
+```
+1 -- NPU load:  Core0: 75%, Core1:  0%, Core2:  0%,
+2 -- NPU load:  Core0: 69%, Core1: 74%, Core2:  0%,
+3 -- NPU load:  Core0: 49%, Core1: 49%, Core2: 49%,
+4 -- NPU load:  Core0: 71%, Core1: 38%, Core2: 39%,
+5 -- NPU load:  Core0: 59%, Core1: 60%, Core2: 30%,
+6 -- NPU load:  Core0: 49%, Core1: 50%, Core2: 49%,
+```
+
 - free
 
 ![](pic/free.png)
