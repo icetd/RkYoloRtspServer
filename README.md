@@ -85,7 +85,11 @@ bitrate = 1440
 
 ## demo
 
+- yolov5s
 ![](pic/demo.png)
+
+- yolov5m
+![](pic/yolov5m.png)
 
 ## tags Notes
 ```
