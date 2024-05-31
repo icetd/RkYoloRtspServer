@@ -99,8 +99,9 @@ void TransCoder::run()
             m_cur_yolo++;
             frameSize = 0;
             
+            m_pool->enqueue(&RkYolo::Inference, cur_yolo, config.width, config.height);
+            
             if (m_in_buffer_list.size() >= config.rknn_thread) {
-                m_pool->enqueue(&RkYolo::Inference, cur_yolo, config.width, config.height);
                 /*Use the first output data to ensure that yolo is executed*/
                 frameSize = rk_encoder->encode(m_out_buffer_list.at(m_cur_yolo % config.rknn_thread).data(), resize, encodeData); 
                 LOG(INFO, "encodeData size %d", frameSize);
