@@ -46,7 +46,7 @@ bitrate = 1440
 - support yuy2 format usb camera.
 - support hardware h264 encode.
 - yolov5 target detection
-- mutiple npu
+- mutliple npu
 
 ## resource utilization
 - yolov5s
