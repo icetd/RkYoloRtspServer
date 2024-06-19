@@ -120,6 +120,16 @@ int RkYolo::Init(rknn_core_mask mask)
 }
 
 
+void drawTextWithBackground(cv::Mat &image, const std::string &text, cv::Point org, int fontFace, double fontScale, cv::Scalar textColor, cv::Scalar bgColor, int thickness) 
+{
+	int baseline = 0;
+	cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
+	baseline += thickness;
+	cv::Rect textBgRect(org.x, org.y - textSize.height, textSize.width, textSize.height + baseline);
+	cv::rectangle(image, textBgRect, bgColor, cv::FILLED);
+	cv::putText(image, text, org, fontFace, fontScale, textColor, thickness);
+}
+
 int RkYolo::Inference(int in_width, int in_height)
 {
     int ret = -1;
@@ -187,15 +197,19 @@ int RkYolo::Inference(int in_width, int in_height)
                  box_conf_threshold, nms_threshold, pads, scale_w, scale_h, out_zps, out_scales, &detect_result_group);
 
     // Draw Objects
-    char text[256];
-    for (int i = 0; i < detect_result_group.count; i++) {
-        detect_result_t *det_result = &(detect_result_group.results[i]);
-        sprintf(text, "%s %.1f%%", det_result->name, det_result->prop * 100);
-        int x1 = det_result->box.left;
-        int y1 = det_result->box.top;
-        cv::rectangle(ori_img, cv::Point(x1, y1), cv::Point(det_result->box.right, det_result->box.bottom), cv::Scalar(0, 0, 255, 0), 3);
-        cv::putText(ori_img, text, cv::Point(x1, y1 + 12), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255));
-    }
+	char text[256];
+	for (int i = 0; i < detect_result_group.count; i++) {
+		detect_result_t *det_result = &(detect_result_group.results[i]);
+		sprintf(text, "%s %.1f%%", det_result->name, det_result->prop * 100);
+		int x1 = det_result->box.left;
+		int y1 = det_result->box.top;
+		int x2 = det_result->box.right;
+		int y2 = det_result->box.bottom;
+		cv::Rect rect(x1, y1, x2 - x1, y2 - y1);
+		cv::Scalar color = cv::Scalar(0, 55, 218);
+		cv::rectangle(ori_img, rect, color, 2);
+		drawTextWithBackground(ori_img, text, cv::Point(x1 - 1, y1 - 6), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(255, 255, 255), cv::Scalar(0, 55, 218, 0.5), 2);
+	}
 
     cv::Mat resized_img;
     resize(ori_img, resized_img, cv::Size(in_width, in_height));
