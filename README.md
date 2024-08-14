@@ -1,4 +1,4 @@
-# RkCamRtspServer
+# RkYoloRtspServer
 simple yolov5 rtspserver for rk3588
 
 ## test env
