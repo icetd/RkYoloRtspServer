@@ -9,8 +9,8 @@
 
 RkEncoder::RkEncoder(Encoder_Param_t param) : m_param(param)
 {
-	m_param.hor_stride = MPP_ALIGN(m_param.width, 16);
-	m_param.ver_stride = MPP_ALIGN(m_param.height, 16);
+	m_param.hor_stride = m_param.width;
+	m_param.ver_stride = m_param.height;
 
 	if (m_param.fmt <= MPP_FMT_YUV422SP_VU) {
 		m_param.hor_stride;
