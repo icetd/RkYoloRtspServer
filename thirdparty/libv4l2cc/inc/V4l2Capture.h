@@ -10,7 +10,7 @@ protected:
 	V4l2Capture(V4l2Device *device);
 
 public:
-	static V4l2Capture *create(const V4L2DeviceParameters &param);
+	static V4l2Capture *create(const V4L2DeviceParameters &param, v4l2_buf_type buf_type);
 	virtual ~V4l2Capture();
 
 	size_t read(char *buffer, size_t bufferSize);

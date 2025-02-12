@@ -29,7 +29,7 @@ int main()
 	
 	initLogger(INFO);
 	V4L2DeviceParameters param(in_devname, V4L2_PIX_FMT_MJPEG, width, height, fps, ioTypeIn, DEBUG);
-	V4l2Capture *videoCapture = V4l2Capture::create(param);
+	V4l2Capture *videoCapture = V4l2Capture::create(param, V4L2_BUF_TYPE_VIDEO_CAPTURE);
 	
 	if (videoCapture == nullptr) {
 		LOG(WARN, "Cannot reading from V4l2 capture interface for device: %s", in_devname);

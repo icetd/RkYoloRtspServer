@@ -16,19 +16,26 @@ V4l2Capture::~V4l2Capture()
 {
 }
 
-V4l2Capture *V4l2Capture::create(const V4L2DeviceParameters &param)
+/** @brief create v4l2capture
+ *  @param buf_type: V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE | V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+ * */
+V4l2Capture *V4l2Capture::create(const V4L2DeviceParameters &param, v4l2_buf_type buf_type)
 {
 	V4l2Capture *videoCapture = nullptr;
 	V4l2Device *videoDevice = nullptr;
-	int caps = V4L2_CAP_VIDEO_CAPTURE;
+	int caps = 0;
 
-	switch(param.m_IoType) {
+    buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE 
+    ? caps = V4L2_CAP_VIDEO_CAPTURE_MPLANE 
+    : caps = V4L2_CAP_VIDEO_CAPTURE;
+	
+    switch(param.m_IoType) {
 	case IOTYPE_MMAP:
-		videoDevice = new V4l2MmapDevice(param, V4L2_BUF_TYPE_VIDEO_CAPTURE);
+		videoDevice = new V4l2MmapDevice(param, buf_type);
 		caps |= V4L2_CAP_STREAMING;
 		break;
 	case IOTYPE_READWRITE:
-		videoDevice = new V4l2ReadWriteDevice(param, V4L2_BUF_TYPE_VIDEO_CAPTURE);
+		videoDevice = new V4l2ReadWriteDevice(param, buf_type);
 		caps |= V4L2_CAP_READWRITE;
 		break;
 	}

@@ -2,6 +2,7 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <linux/videodev2.h>
+#include <linux/v4l2-subdev.h>
 #include <sys/ioctl.h>
 #include <V4l2Device.h>
 #include <string.h>
@@ -64,7 +65,7 @@ void V4l2Device::queryFormat()
 		m_width			= fmt.fmt.pix.width;
 		m_height		= fmt.fmt.pix.height;
 		m_bufferSize	= fmt.fmt.pix.sizeimage;
-		LOG(INFO, "%s:%s size:%dx%d bufferSize:%d", m_params.m_devName.c_str(), 
+		LOG(NOTICE, "%s:%s size:%dx%d bufferSize:%d", m_params.m_devName.c_str(), 
 				fourcc(m_format).c_str(), m_width, m_height, m_bufferSize);
 	}
 }
@@ -104,7 +105,8 @@ int V4l2Device::initdevice(const char *dev_name, uint32_t mandatoryCapabilities)
 		this->destroy();
 		return -1;
 	}
-	if (checkCapAbilities(m_fd, mandatoryCapabilities) != 0) {
+ 
+    if (checkCapAbilities(m_fd, mandatoryCapabilities) != 0) {
 		this->destroy();
 		return -1;
 	}
@@ -116,6 +118,7 @@ int V4l2Device::initdevice(const char *dev_name, uint32_t mandatoryCapabilities)
 		this->destroy();
 		return -1;
 	}
+
 	return m_fd;
 }
 /** @brief check Cap Abilities
@@ -136,15 +139,34 @@ int V4l2Device::checkCapAbilities(int fd, uint32_t mandatoryCapabilities)
 					capability.driver,
 					capability.capabilities,
 					mandatoryCapabilities);
-	
-	if ((capability.capabilities & V4L2_CAP_VIDEO_OUTPUT) 
+
+    LOG(NOTICE, "card: %s", capability.card);
+    LOG(NOTICE, "bus_info: %s", capability.bus_info);
+    LOG(NOTICE, "version: %d.%d.%d",
+           (capability.version >> 16) & 0xff,
+           (capability.version >> 8) & 0xff,
+           (capability.version & 0xff));
+
+    if ((capability.capabilities & V4L2_CAP_VIDEO_CAPTURE) 
 			== V4L2_CAP_VIDEO_OUTPUT) {
-		LOG(NOTICE, "%s support output" , m_params.m_devName.c_str());
+		LOG(NOTICE, "%s support video capture" , m_params.m_devName.c_str());
 	}
-	if ((capability.capabilities & V4L2_CAP_VIDEO_CAPTURE) 
-			== V4L2_CAP_VIDEO_CAPTURE) {
-		LOG(NOTICE, "%s support capture" , m_params.m_devName.c_str());
+
+    if ((capability.capabilities & V4L2_CAP_VIDEO_OUTPUT) 
+			== V4L2_CAP_VIDEO_OUTPUT) {
+		LOG(NOTICE, "%s support video output" , m_params.m_devName.c_str());
 	}
+
+    if ((capability.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) 
+			== V4L2_CAP_VIDEO_CAPTURE_MPLANE) {
+		LOG(NOTICE, "%s support output mplane" , m_params.m_devName.c_str());
+    }
+
+    if ((capability.capabilities & V4L2_CAP_VIDEO_OUTPUT_MPLANE) 
+			== V4L2_CAP_VIDEO_OUTPUT_MPLANE) {
+		LOG(NOTICE, "%s support video output mplane" , m_params.m_devName.c_str());
+	}
+
 	if ((capability.capabilities & V4L2_CAP_READWRITE) 
 			== V4L2_CAP_READWRITE) {
 		LOG(NOTICE, "%s support read/write" , m_params.m_devName.c_str());
@@ -157,6 +179,7 @@ int V4l2Device::checkCapAbilities(int fd, uint32_t mandatoryCapabilities)
 			== V4L2_CAP_TIMEPERFRAME) {
 		LOG(NOTICE, "%s support timeperframe" , m_params.m_devName.c_str());
 	}
+
 	if ((capability.capabilities & mandatoryCapabilities) 
 			!= mandatoryCapabilities) {
 		LOG(ERROR, "Mandatory capability not avaiable for device:%s" , 
@@ -195,7 +218,7 @@ int V4l2Device::configureFormat(int fd)
 			// get the format again 
 			// because calling SET-FMT return a bad buffersize 
 			// using v4l2loopback
-			this->queryFormat();		
+            this->queryFormat();		
 			return 0;
 		}
 	}
@@ -214,11 +237,8 @@ int V4l2Device::configureFormat(int fd, uint32_t format,
 	struct v4l2_format fmt;
 	memset(&fmt, 0, sizeof(fmt));
 	fmt.type = m_deviceType;
-	if (ioctl(fd, VIDIOC_G_FMT, &fmt) < 0) {
-		LOG(ERROR, "%s: Cannot get format", m_params.m_devName.c_str());
-		return -1;
-	}
-	if (width != 0)
+	
+    if (width != 0)
 		fmt.fmt.pix.width = width;
 	if (height != 0)
 		fmt.fmt.pix.height = height;
@@ -252,27 +272,42 @@ int V4l2Device::configureFormat(int fd, uint32_t format,
 	return 0;
 }
 
+
+int get_subdev_frame_interval(int fd) {
+    struct v4l2_subdev_frame_interval frame_interval;
+    memset(&frame_interval, 0, sizeof(frame_interval));
+
+    // 获取子设备的帧间隔
+    if (ioctl(fd, VIDIOC_SUBDEV_G_FRAME_INTERVAL, &frame_interval) == -1) {
+        perror("Getting subdev frame interval failed");
+        return -1;
+    }
+
+    return 0;
+}
+
+
 /** @brief config video stream fps 
  *	@param fd:		File descriptor
  *	@param fps:		video fps
  * */
 int V4l2Device::configureParam(int fd, int fps)
 {
-	if (fps != 0) {
-		struct v4l2_streamparm params;
-		memset(&params, 0, sizeof(params));
-		params.type = m_deviceType;
-		params.parm.capture.timeperframe.numerator = 1;
-		params.parm.capture.timeperframe.denominator = fps;
+    if (fps != 0) {
+        struct v4l2_streamparm params;
+        memset(&params, 0, sizeof(params));
+        params.type = m_deviceType;
+        params.parm.capture.timeperframe.numerator = 1;
+        params.parm.capture.timeperframe.denominator = fps;
 
-		if (ioctl(fd, VIDIOC_S_PARM, &params) == -1) {
-			LOG(ERROR, "Cannot set parm for device:%s %s", 
-					m_params.m_devName.c_str(), strerror(errno));
-		}
-		LOG(NOTICE, "fps:%d/%d", 
-			params.parm.capture.timeperframe.numerator,			
-			params.parm.capture.timeperframe.denominator);
-		LOG(NOTICE, "nbBuffer:%d", params.parm.capture.readbuffers);
-	}
-	return 0;
+        if (ioctl(fd, VIDIOC_S_PARM, &params) == -1) {
+            LOG(WARN, "Cannot set parm for device:%s %s",
+                m_params.m_devName.c_str(), strerror(errno));
+        }
+        LOG(NOTICE, "fps:%d/%d",
+            params.parm.capture.timeperframe.numerator,
+            params.parm.capture.timeperframe.denominator);
+        LOG(NOTICE, "nbBuffer:%d", params.parm.capture.readbuffers);
+    }
+    return 0;
 }

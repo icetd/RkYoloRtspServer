@@ -27,7 +27,7 @@ struct V4L2DeviceParameters {
 	/** @brief device paramters */
 	V4L2DeviceParameters(const char *devname, const std::list<uint32_t> &formatList, 
 			uint32_t width, uint32_t height,int fps, v4l2IoType ioType, 
-			int level = 0, int openFlags = O_RDWR | O_NONBLOCK) : 
+			int level = 0, int openFlags = O_RDWR | O_NONBLOCK | O_CLOEXEC) : 
 		m_devName (devname),
 		m_formatList(formatList),
 		m_width(width),
@@ -39,7 +39,7 @@ struct V4L2DeviceParameters {
 	
 	V4L2DeviceParameters(const char *devname, uint32_t format, 
 			uint32_t width, uint32_t height, int fps, v4l2IoType ioType = IOTYPE_MMAP, 
-			int level = 0, int openFlags = O_RDWR | O_NONBLOCK) : 
+			int level = 0, int openFlags = O_RDWR | O_NONBLOCK | O_CLOEXEC) : 
 		m_devName (devname),
 		m_width(width),
 		m_height(height),

@@ -20,6 +20,7 @@ void TransCoder::init()
     std::list<uint32_t> formatList;
     v4l2IoType ioTypeIn = IOTYPE_MMAP;
     MppFrameFormat mpp_fmt;
+    v4l2_buf_type buf_type;
 
     INIReader configs("./configs/config.ini");
     if (configs.ParseError() < 0) {
@@ -32,11 +33,11 @@ void TransCoder::init()
         config.fix_qp = configs.GetInteger("video", "fix_qp", 23);
         config.device_name = configs.Get("video", "device", "/dev/video0");
         config.rknn_thread = configs.GetInteger("rknn", "rknn_thread", 3);
-
         config.rknn_thread = (config.rknn_thread > 6) ? 6 : config.rknn_thread;
 
         formatList.push_back(V4L2_PIX_FMT_YUYV);
         mpp_fmt = MPP_FMT_YUV420P;
+        buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     }
 
     V4L2DeviceParameters param(config.device_name.c_str(),
@@ -47,7 +48,7 @@ void TransCoder::init()
                                ioTypeIn,
                                DEBUG);
 
-    capture = V4l2Capture::create(param);
+    capture = V4l2Capture::create(param, buf_type);
     encodeData = (uint8_t *)malloc(capture->getBufferSize());
 
     Encoder_Param_t encoder_param{

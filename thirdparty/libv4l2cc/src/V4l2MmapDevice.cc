@@ -1,4 +1,5 @@
 #include <linux/videodev2.h>
+#include <linux/v4l2-subdev.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -54,34 +55,51 @@ bool V4l2MmapDevice::start()
 	} else {
 		/* mmap get the qbuf address */
 		LOG(NOTICE, "Device %s nb buffer:%d", m_params.m_devName.c_str(), req.count);
-		
+        
 		memset(&m_buffer, 0, sizeof(m_buffer));
 		for (n_buffers = 0; n_buffers < req.count; ++n_buffers) {
 			struct v4l2_buffer buf;
+            struct v4l2_plane planes[1];
+            memset(&buf, 0, sizeof(buf));
 			memset(&buf, 0, sizeof(buf));
 			buf.type	= m_deviceType;
 			buf.memory	= V4L2_MEMORY_MMAP;
 			buf.index	= n_buffers;
 
+            if (m_deviceType == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+                buf.m.planes = planes;
+                buf.length = 1;
+            }
+
 			if ( ioctl(m_fd, VIDIOC_QUERYBUF, &buf) < 0 ) {
 				perror("VIDIOC_QUERYBUF");
 				success = false;
 			} else {
-				LOG(INFO, "Device %s buffer idx:%d, size:%d offset:%d", 
-						m_params.m_devName.c_str(), n_buffers, buf.length, buf.m.offset);
-				m_buffer[n_buffers].length = buf.length;
-				if (!m_buffer[n_buffers].length) {
-					m_buffer[n_buffers].length = buf.bytesused;
-				}
-				//Save the first address of user space after mapping
-				m_buffer[n_buffers].start = mmap(NULL,
-						m_buffer[n_buffers].length, 
-						PROT_READ | PROT_WRITE,
-						MAP_SHARED,
-						m_fd,
-						buf.m.offset);
-				
-				if (MAP_FAILED == m_buffer[n_buffers].start) {
+
+                if (m_deviceType == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
+                    LOG(INFO, "Device %s buffer idx:%d, size:%d offset:%d", m_params.m_devName.c_str(), n_buffers, buf.length, buf.m.offset);
+                    m_buffer[n_buffers].length = buf.length;
+                    if (!m_buffer[n_buffers].length) {
+                        m_buffer[n_buffers].length = buf.bytesused;
+                    }
+                    // Save the first address of user space after mapping
+                    m_buffer[n_buffers].start = mmap(NULL,
+                                                     m_buffer[n_buffers].length,
+                                                     PROT_READ | PROT_WRITE,
+                                                     MAP_SHARED,
+                                                     m_fd,
+                                                     buf.m.offset);
+                } 
+                else if (m_deviceType == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+                    m_buffer[n_buffers].length = buf.m.planes[0].length;
+                    m_buffer[n_buffers].start = mmap(NULL /* start anywhere */,
+                                                     buf.m.planes[0].length,
+                                                     PROT_READ | PROT_WRITE /* required */,
+                                                     MAP_SHARED /* recommended */,
+                                                     m_fd, buf.m.planes[0].m.mem_offset);
+                }
+
+                if (MAP_FAILED == m_buffer[n_buffers].start) {
 					perror("mmap");
 					success =false;
 				}
@@ -90,11 +108,17 @@ bool V4l2MmapDevice::start()
 		/* queue buffers */
 		for(uint32_t i = 0; i < n_buffers; ++i) {
 			struct v4l2_buffer buf;
+            struct v4l2_plane planes[1];
 			memset(&buf, 0, sizeof(buf));
 			buf.type	= m_deviceType;
 			buf.memory	= V4L2_MEMORY_MMAP;
 			buf.index	= i;
-			if (ioctl(m_fd, VIDIOC_QBUF, &buf) < 0) {
+
+            if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == buf.type) {
+                buf.m.planes = planes;
+                buf.length = 1;
+            }
+            if (ioctl(m_fd, VIDIOC_QBUF, &buf) < 0) {
 				perror("VIDIOC_QBUF");
 				success = false;
 			}
@@ -149,23 +173,34 @@ size_t V4l2MmapDevice::readInternal(char *buffer, size_t bufferSize)
 	size_t size = 0;
 	if (n_buffers > 0) {
 		struct v4l2_buffer buf;
+        struct v4l2_plane planes[1];
 		memset(&buf, 0, sizeof(buf));
 		buf.type = m_deviceType;
 		buf.memory = V4L2_MEMORY_MMAP;
+        
+        if (buf.type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+            buf.m.planes = planes;
+            buf.length = 1;
+        }
+
 		/* 将已经捕获好视频的内存拉出队列 */
 		if (ioctl(m_fd, VIDIOC_DQBUF, &buf) == -1){
 			perror("VIDIOC_DQBUF");
 			size = -1;
 		} else if (buf.index < n_buffers){
-			size = buf.bytesused;
-			if (size > bufferSize) {
+            if (buf.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
+                size = buf.bytesused;
+            else if (buf.type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
+                size = buf.m.planes[0].bytesused;
+            
+            if (size > bufferSize) {
 				size = bufferSize;
 				LOG(WARN, "Device %s buffer truncated available:%d needed:%d", m_params.m_devName.c_str(),
-					bufferSize, buf.bytesused);
+					bufferSize, planes[0].length);
 			}
+
 			/*get video stream*/
 			memcpy(buffer, m_buffer[buf.index].start, size);
-
 			/* 将空闲的内存加入可捕获视频的队列 */
 			if (ioctl(m_fd, VIDIOC_QBUF, &buf)) {
 				perror("VIDIOC_QBUF");
