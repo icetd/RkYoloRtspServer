@@ -6,12 +6,11 @@
 #include <H264VideoRTPSink.hh>
 #include <H264VideoStreamDiscreteFramer.hh>
 
-class CamUbicastServerMediaSubsession : public OnDemandServerMediaSubsession 
+class CamUbicastServerMediaSubsession : public OnDemandServerMediaSubsession
 {
 public:
     static CamUbicastServerMediaSubsession *
     createNew(UsageEnvironment &env, StreamReplicator *replicator, size_t estBitrate, size_t udpDatagramSize);
-
 
 protected:
     StreamReplicator *replicator_;
@@ -20,15 +19,15 @@ protected:
 
     size_t udpDatagramSize_;
 
-    CamUbicastServerMediaSubsession(UsageEnvironment &env, 
+    CamUbicastServerMediaSubsession(UsageEnvironment &env,
                                     StreamReplicator *replicator,
                                     size_t estBitrate,
                                     size_t udpDatagramSize);
 
     FramedSource *createNewStreamSource(unsigned clientSessionId, unsigned &estBitrate) override;
 
-    RTPSink *createNewRTPSink(Groupsock *rtpGroupsock, 
-                              unsigned char rtpPayloadTypeIfDynamic, 
+    RTPSink *createNewRTPSink(Groupsock *rtpGroupsock,
+                              unsigned char rtpPayloadTypeIfDynamic,
                               FramedSource *inputSource) override;
 };
 

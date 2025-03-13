@@ -10,7 +10,7 @@
 #include "CamFramedSource.h"
 #include "CamUnicastServerMediaSubsession.h"
 
-class CamRTSPServer 
+class CamRTSPServer
 {
 public:
     typedef struct {
@@ -50,7 +50,7 @@ private:
 
     /**
      * @brief Announce new create media session.
-     * 
+     *
      * @param sms - create server media session.
      * @param deviceName - the name of video source device.
      */
@@ -58,13 +58,12 @@ private:
 
     /**
      * @brief Add new server media session using transcoder as a source to the server
-     * 
+     *
      * @param transoder - video source.
      * @param streamName - the name of stream (part of the URL), e.g. rtsp://<ip>/camera/1.
      * @param streamDesc - description of stream.
      */
     void addMediaSession(std::shared_ptr<TransCoder> transoder, const std::string &streamName, const std::string &streamDesc);
-
 };
 
 #endif

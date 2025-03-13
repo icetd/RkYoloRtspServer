@@ -6,7 +6,8 @@
 #include <mutex>
 #include "transcoder.h"
 
-class CamFramedSource : public FramedSource {
+class CamFramedSource : public FramedSource
+{
 public:
     static CamFramedSource *createNew(UsageEnvironment &env, TransCoder &transcoder);
 
@@ -24,7 +25,7 @@ private:
 
     size_t max_nalu_size_bytes;
     std::vector<uint8_t> encodedData;
-    std::vector<std::vector<uint8_t> > encodedDataBuffer;
+    std::vector<std::vector<uint8_t>> encodedDataBuffer;
 
     void onEncodedData(std::vector<uint8_t> &&data);
 

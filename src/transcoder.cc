@@ -63,12 +63,11 @@ void TransCoder::init()
 
     rk_encoder = new RkEncoder(encoder_param);
     rk_encoder->init();
- 
+
     m_pool = new ThreadPool(config.rknn_thread);
 
-
     for (int i = 0; i < config.rknn_thread; i++) {
-    RkYolo *rkyolo = new RkYolo();
+        RkYolo *rkyolo = new RkYolo();
         rkyolo->Init((rknn_core_mask)(1 << (i % 3)));
         m_rkyolo_list.push_back(rkyolo);
     }
@@ -80,9 +79,9 @@ void TransCoder::run()
     timeval tv;
     m_out_buffer_list.resize(config.rknn_thread, std::vector<uint8_t>(capture->getBufferSize()));
     for (;;) {
-        if (m_cur_yolo >= config.rknn_thread) 
+        if (m_cur_yolo >= config.rknn_thread)
             m_cur_yolo = 0;
-        
+
         tv.tv_sec = 1;
         tv.tv_usec = 0;
         int startCode = 0;
@@ -96,15 +95,15 @@ void TransCoder::run()
 
             RkYolo *cur_yolo = m_rkyolo_list.at(m_cur_yolo);
             cur_yolo->SetBuffers(m_in_buffer_list.at(m_cur_yolo).data(), m_out_buffer_list.at(m_cur_yolo).data());
-            
+
             m_cur_yolo++;
             frameSize = 0;
-            
+
             m_pool->enqueue(&RkYolo::Inference, cur_yolo, config.width, config.height);
-            
+
             if (m_in_buffer_list.size() >= config.rknn_thread) {
                 /*Use the first output data to ensure that yolo is executed*/
-                frameSize = rk_encoder->encode(m_out_buffer_list.at(m_cur_yolo % config.rknn_thread).data(), resize, encodeData); 
+                frameSize = rk_encoder->encode(m_out_buffer_list.at(m_cur_yolo % config.rknn_thread).data(), resize, encodeData);
                 LOG(INFO, "encodeData size %d", frameSize);
                 if (rk_encoder->startCode3(encodeData))
                     startCode = 3;

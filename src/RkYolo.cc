@@ -20,7 +20,7 @@ RkYolo::~RkYolo()
 }
 
 int RkYolo::Init(rknn_core_mask mask)
-{   
+{
     int ret = -1;
     FILE *fp;
 
@@ -28,8 +28,8 @@ int RkYolo::Init(rknn_core_mask mask)
     m_config.model_path = ini.Get("rknn", "model_path", "model/yolov5.rknn");
 
     fp = fopen(m_config.model_path.c_str(), "rb");
-    
-    fseek(fp, 0 , SEEK_END);
+
+    fseek(fp, 0, SEEK_END);
     int size = ftell(fp);
 
     m_model_data = (uint8_t *)malloc(size);
@@ -55,7 +55,7 @@ int RkYolo::Init(rknn_core_mask mask)
         LOG(ERROR, "rknn_init error ret=%d", ret);
         return -1;
     }
-    
+
     m_core_mask = mask;
     ret = rknn_set_core_mask(m_rknn_ctx, m_core_mask);
     if (ret < 0) {
@@ -119,24 +119,23 @@ int RkYolo::Init(rknn_core_mask mask)
     return ret;
 }
 
-
-void drawTextWithBackground(cv::Mat &image, const std::string &text, cv::Point org, int fontFace, double fontScale, cv::Scalar textColor, cv::Scalar bgColor, int thickness) 
+void drawTextWithBackground(cv::Mat &image, const std::string &text, cv::Point org, int fontFace, double fontScale, cv::Scalar textColor, cv::Scalar bgColor, int thickness)
 {
-	int baseline = 0;
-	cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
-	baseline += thickness;
-	cv::Rect textBgRect(org.x, org.y - textSize.height, textSize.width, textSize.height + baseline);
-	cv::rectangle(image, textBgRect, bgColor, cv::FILLED);
-	cv::putText(image, text, org, fontFace, fontScale, textColor, thickness);
+    int baseline = 0;
+    cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
+    baseline += thickness;
+    cv::Rect textBgRect(org.x, org.y - textSize.height, textSize.width, textSize.height + baseline);
+    cv::rectangle(image, textBgRect, bgColor, cv::FILLED);
+    cv::putText(image, text, org, fontFace, fontScale, textColor, thickness);
 }
 
 int RkYolo::Inference(int in_width, int in_height)
 {
     int ret = -1;
-    cv::Mat yuvImage(in_height, in_width, CV_8UC2, (void*)m_inbuf);
+    cv::Mat yuvImage(in_height, in_width, CV_8UC2, (void *)m_inbuf);
     cv::Mat ori_img;
-    cvtColor(yuvImage, ori_img, cv::COLOR_YUV2RGB_YUY2);  // Use COLOR_YUV2BGR_YUY2 for YUYV format
-    
+    cvtColor(yuvImage, ori_img, cv::COLOR_YUV2RGB_YUY2); // Use COLOR_YUV2BGR_YUY2 for YUYV format
+
     // init rga context
     rga_buffer_t src;
     rga_buffer_t dst;
@@ -197,19 +196,19 @@ int RkYolo::Inference(int in_width, int in_height)
                  box_conf_threshold, nms_threshold, pads, scale_w, scale_h, out_zps, out_scales, &detect_result_group);
 
     // Draw Objects
-	char text[256];
-	for (int i = 0; i < detect_result_group.count; i++) {
-		detect_result_t *det_result = &(detect_result_group.results[i]);
-		sprintf(text, "%s %.1f%%", det_result->name, det_result->prop * 100);
-		int x1 = det_result->box.left;
-		int y1 = det_result->box.top;
-		int x2 = det_result->box.right;
-		int y2 = det_result->box.bottom;
-		cv::Rect rect(x1, y1, x2 - x1, y2 - y1);
-		cv::Scalar color = cv::Scalar(0, 55, 218);
-		cv::rectangle(ori_img, rect, color, 2);
-		drawTextWithBackground(ori_img, text, cv::Point(x1 - 1, y1 - 6), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(255, 255, 255), cv::Scalar(0, 55, 218, 0.5), 2);
-	}
+    char text[256];
+    for (int i = 0; i < detect_result_group.count; i++) {
+        detect_result_t *det_result = &(detect_result_group.results[i]);
+        sprintf(text, "%s %.1f%%", det_result->name, det_result->prop * 100);
+        int x1 = det_result->box.left;
+        int y1 = det_result->box.top;
+        int x2 = det_result->box.right;
+        int y2 = det_result->box.bottom;
+        cv::Rect rect(x1, y1, x2 - x1, y2 - y1);
+        cv::Scalar color = cv::Scalar(0, 55, 218);
+        cv::rectangle(ori_img, rect, color, 2);
+        drawTextWithBackground(ori_img, text, cv::Point(x1 - 1, y1 - 6), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(255, 255, 255), cv::Scalar(0, 55, 218, 0.5), 2);
+    }
 
     cv::Mat resized_img;
     resize(ori_img, resized_img, cv::Size(in_width, in_height));

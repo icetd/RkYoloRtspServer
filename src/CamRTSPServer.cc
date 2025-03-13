@@ -13,9 +13,9 @@ CamRTSPServer::CamRTSPServer() :
     } else {
         config.rtspPort = configs.GetInteger("server", "rtsp_port", 8554);
         config.streamName = configs.Get("server", "stream_name", "unicast");
-	config.maxBufSize = configs.GetInteger("server", "max_buf_size", 2000000);
-	config.maxPacketSize = configs.GetInteger("server", "max_packet_size", 1500);
-	config.isHttpEnable = configs.GetBoolean("server", "http_ebable", false);
+        config.maxBufSize = configs.GetInteger("server", "max_buf_size", 2000000);
+        config.maxPacketSize = configs.GetInteger("server", "max_packet_size", 1500);
+        config.isHttpEnable = configs.GetBoolean("server", "http_ebable", false);
         config.httpPort = configs.GetInteger("server", "http_port", 8000);
         config.bitrate = configs.GetInteger("server", "bitrate", 2000);
     }
@@ -32,14 +32,14 @@ CamRTSPServer::~CamRTSPServer()
     Medium::close(server_);
 
     for (auto &src : allocatedVideoSources) {
-        if(src) 
+        if (src)
             Medium::close(src);
     }
 
     env_->reclaim();
     if (scheduler_)
         delete scheduler_;
-    
+
     transcoders_.clear();
     allocatedVideoSources.clear();
     watcher_ = 0;
@@ -79,14 +79,14 @@ void CamRTSPServer::run()
     env_->taskScheduler().doEventLoop(&watcher_); // do not return;
 }
 
-void CamRTSPServer::announceStream(ServerMediaSession *sms, const std::string &deviceName) 
+void CamRTSPServer::announceStream(ServerMediaSession *sms, const std::string &deviceName)
 {
     auto url = server_->rtspURL(sms);
-    LOG(NOTICE, "Play the stream of the %s, url: %s", deviceName.c_str(), url);   
+    LOG(NOTICE, "Play the stream of the %s, url: %s", deviceName.c_str(), url);
     delete[] url;
 }
 
-void CamRTSPServer::addMediaSession(std::shared_ptr<TransCoder> transoder, const std::string &streamName, 
+void CamRTSPServer::addMediaSession(std::shared_ptr<TransCoder> transoder, const std::string &streamName,
                                     const std::string &streamDesc)
 {
     LOG(INFO, "Adding media session for camera: %s", transoder->getConfig().device_name.c_str());
@@ -102,9 +102,9 @@ void CamRTSPServer::addMediaSession(std::shared_ptr<TransCoder> transoder, const
 
     // create media session with the specified topic and descripton
     auto sms = ServerMediaSession::createNew(*env_, streamName.c_str(), "stream information",
-                                            streamDesc.c_str(), False, "a=fmtp:96\n");
+                                             streamDesc.c_str(), False, "a=fmtp:96\n");
 
-    // add unicast subsession 
+    // add unicast subsession
     sms->addSubsession(CamUbicastServerMediaSubsession::createNew(*env_, replicator, config.bitrate, config.maxPacketSize));
 
     server_->addServerMediaSession(sms);

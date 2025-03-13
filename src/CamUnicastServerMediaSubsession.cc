@@ -2,9 +2,9 @@
 #include "log.h"
 
 CamUbicastServerMediaSubsession *
-CamUbicastServerMediaSubsession::createNew(UsageEnvironment &env, 
-                StreamReplicator *replicator, 
-                size_t estBitrate, size_t udpDatagramSize) 
+CamUbicastServerMediaSubsession::createNew(UsageEnvironment &env,
+                                           StreamReplicator *replicator,
+                                           size_t estBitrate, size_t udpDatagramSize)
 {
     return new CamUbicastServerMediaSubsession(env, replicator, estBitrate, udpDatagramSize);
 }
@@ -18,15 +18,15 @@ CamUbicastServerMediaSubsession::CamUbicastServerMediaSubsession(UsageEnvironmen
     estBitrate_(estBitrate),
     udpDatagramSize_(udpDatagramSize)
 {
-    LOG(INFO, "Unicast media subsession with UDP datagram size of %d\n" \
-               "\tand estimated bitrate of %d (kbps) is created", udpDatagramSize, estBitrate);
-
+    LOG(INFO, "Unicast media subsession with UDP datagram size of %d\n"
+              "\tand estimated bitrate of %d (kbps) is created",
+        udpDatagramSize, estBitrate);
 }
 
 FramedSource *
 CamUbicastServerMediaSubsession::createNewStreamSource(unsigned clientSessionId, unsigned &estBitrate)
 {
-    estBitrate = static_cast<unsigned int> (this->estBitrate_);
+    estBitrate = static_cast<unsigned int>(this->estBitrate_);
 
     auto source = replicator_->createStreamReplica();
 
@@ -36,10 +36,10 @@ CamUbicastServerMediaSubsession::createNewStreamSource(unsigned clientSessionId,
 
 RTPSink *
 CamUbicastServerMediaSubsession::createNewRTPSink(Groupsock *rtpGroupsock,
-                          unsigned char rtpPayloadTypeIfDynamic,
-                          FramedSource *inputSource)
+                                                  unsigned char rtpPayloadTypeIfDynamic,
+                                                  FramedSource *inputSource)
 {
     auto sink = H264VideoRTPSink::createNew(envir(), rtpGroupsock, rtpPayloadTypeIfDynamic);
-    sink->setPacketSizes(static_cast<unsigned int> (udpDatagramSize_), static_cast<unsigned int>(udpDatagramSize_));
+    sink->setPacketSizes(static_cast<unsigned int>(udpDatagramSize_), static_cast<unsigned int>(udpDatagramSize_));
     return sink;
 }

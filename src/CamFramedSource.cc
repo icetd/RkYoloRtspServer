@@ -1,7 +1,7 @@
 #include "CamFramedSource.h"
 #include "log.h"
 
-CamFramedSource *CamFramedSource::createNew(UsageEnvironment &env, TransCoder &transcoder) 
+CamFramedSource *CamFramedSource::createNew(UsageEnvironment &env, TransCoder &transcoder)
 {
     return new CamFramedSource(env, transcoder);
 }
@@ -14,14 +14,14 @@ CamFramedSource::CamFramedSource(UsageEnvironment &env, TransCoder &transcoder) 
 {
     // create trigger invoking method which will deliver frame
     eventTriggerId = envir().taskScheduler().createEventTrigger(CamFramedSource::deliverFrame0);
-    encodedDataBuffer.reserve(5);  // reserve enough space for handling incoming encoded data
+    encodedDataBuffer.reserve(5); // reserve enough space for handling incoming encoded data
 
     // set transcoder's callback indicating new encoded data availabity
     transcoder_.setOnEncoderDataCallback(std::bind(&CamFramedSource::onEncodedData, this, std::placeholders::_1));
 
-    LOG(INFO, "Starting to capture and encoder video from video %s", 
+    LOG(INFO, "Starting to capture and encoder video from video %s",
         transcoder_.getConfig().device_name.c_str());
-    
+
     transcoder_.start();
     transcoder_.detach();
 }
@@ -48,11 +48,13 @@ void CamFramedSource::onEncodedData(std::vector<uint8_t> &&data)
     envir().taskScheduler().triggerEvent(eventTriggerId, this);
 }
 
-void CamFramedSource::deliverFrame0(void *clientData) {
-    ((CamFramedSource*) clientData)->deliverData();
+void CamFramedSource::deliverFrame0(void *clientData)
+{
+    ((CamFramedSource *)clientData)->deliverData();
 }
 
-void CamFramedSource::deliverData() {
+void CamFramedSource::deliverData()
+{
     if (!isCurrentlyAwaitingData()) {
         return;
     }
@@ -71,12 +73,12 @@ void CamFramedSource::deliverData() {
         fNumTruncatedBytes = static_cast<unsigned int>(encodedData.size() - fMaxSize);
         LOG(WARN, "Exceeded max size, truncated: %d, size: %d", fNumTruncatedBytes, encodedData.size());
     } else {
-        fFrameSize = static_cast<unsigned int> (encodedData.size());
+        fFrameSize = static_cast<unsigned int>(encodedData.size());
     }
 
     // can be changed to the actual frame's captured time
     gettimeofday(&fPresentationTime, nullptr);
-    
+
     // DO NOT CHANGE ADDRESS, ONLY COPY (see Live555 docs)
     memcpy(fTo, encodedData.data(), fFrameSize);
 

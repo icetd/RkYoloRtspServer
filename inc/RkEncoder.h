@@ -10,35 +10,35 @@
 
 typedef struct
 {
-	MppFrameFormat fmt;
-	int width;
-	int height;
-	int hor_stride;
-	int ver_stride;
-	int frame_size;
-	int fps;
-	int fix_qp;
+    MppFrameFormat fmt;
+    int width;
+    int height;
+    int hor_stride;
+    int ver_stride;
+    int frame_size;
+    int fps;
+    int fix_qp;
 } Encoder_Param_t;
 
 class RkEncoder
 {
 public:
-	RkEncoder(Encoder_Param_t param);
-	~RkEncoder();
+    RkEncoder(Encoder_Param_t param);
+    ~RkEncoder();
 
-	int init();
-	int encode(void *inbuf, int insize, uint8_t *outbuf);
+    int init();
+    int encode(void *inbuf, int insize, uint8_t *outbuf);
 
-	int startCode3(uint8_t *buf);
-	int startCode4(uint8_t *buf);
+    int startCode3(uint8_t *buf);
+    int startCode4(uint8_t *buf);
 
 private:
-	Encoder_Param_t m_param;
-	MppCtx m_contex;
-	MppApi *m_mpi;
-	MppPacket m_packet = nullptr;
-	MppFrame m_frame = nullptr;
-	MppBuffer m_buffer = nullptr;
+    Encoder_Param_t m_param;
+    MppCtx m_contex;
+    MppApi *m_mpi;
+    MppPacket m_packet = nullptr;
+    MppFrame m_frame = nullptr;
+    MppBuffer m_buffer = nullptr;
 };
 
 #endif

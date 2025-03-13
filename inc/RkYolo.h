@@ -4,14 +4,14 @@
 #include "rknn_api.h"
 #include <string>
 
-class RkYolo {
-
-typedef struct {
-    int model_channel;
-    int model_width;
-    int model_height;
-    std::string model_path;
-} Config_t;
+class RkYolo
+{
+    typedef struct {
+        int model_channel;
+        int model_width;
+        int model_height;
+        std::string model_path;
+    } Config_t;
 
 public:
     RkYolo();
@@ -19,7 +19,8 @@ public:
 
     int Init(rknn_core_mask mask);
     int Inference(int width, int height);
-    void SetBuffers(uint8_t* inbuf, uint8_t* out_buf) {
+    void SetBuffers(uint8_t *inbuf, uint8_t *out_buf)
+    {
         m_inbuf = inbuf;
         m_outbuf = out_buf;
     }
@@ -32,10 +33,10 @@ private:
     rknn_sdk_version m_version;
     rknn_input m_input;
     uint8_t *m_model_data;
- 
-    uint8_t* m_inbuf;
-    uint8_t* m_outbuf;
- 
+
+    uint8_t *m_inbuf;
+    uint8_t *m_outbuf;
+
     Config_t m_config;
     rknn_core_mask m_core_mask;
 
