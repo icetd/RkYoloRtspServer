@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 CURRENT_DIR=$(pwd)
-MPP_VERSION=1.0.5
+MPP_VERSION=1.0.6
 MPP_SRC=mpp-${MPP_VERSION}
 MPP_SRC_DIR=${CURRENT_DIR}/thirdparty/${MPP_SRC}
 MPP_URL=https://github.com/rockchip-linux/mpp/archive/refs/tags/${MPP_VERSION}.tar.gz

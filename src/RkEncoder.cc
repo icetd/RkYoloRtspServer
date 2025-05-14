@@ -146,17 +146,32 @@ int RkEncoder::encode(void *inbuf, int insize, uint8_t *outbuf)
         return -1;
     }
 
-    MppPacket m_extra_info;
-    ret = m_mpi->control(m_contex, MPP_ENC_GET_EXTRA_INFO, &m_extra_info);
-    if (ret) {
-        LOG(ERROR, "mpi control enc get extra info failed");
+    MppPacket m_extra_info = NULL;
+    MppBuffer buffer = NULL;
+    size_t size = 1024;
+
+    mpp_buffer_get(NULL, &buffer, size);
+    mpp_packet_init_with_buffer(&m_extra_info, buffer);
+
+    mpp_packet_set_length(m_extra_info, 0);
+
+    ret = m_mpi->control(m_contex, MPP_ENC_GET_HDR_SYNC, m_extra_info);
+    if (ret)
+    {
+        LOG(ERROR, "mpi control enc get header sync failed");
+        mpp_packet_deinit(&m_extra_info);
+        if (buffer)
+            mpp_buffer_put(buffer);
         return -1;
     }
 
     void *ptr_extra_info = mpp_packet_get_data(m_extra_info);
     size_t len_extra_info = mpp_packet_get_length(m_extra_info);
     memcpy(outbuf, ptr_extra_info, len_extra_info);
+
     mpp_packet_deinit(&m_extra_info);
+    if (buffer)
+        mpp_buffer_put(buffer);
 
     void *ptr_video_data = mpp_packet_get_data(m_packet);
     size_t len_video_data = mpp_packet_get_length(m_packet);
