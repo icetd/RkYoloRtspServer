@@ -152,12 +152,10 @@ int RkEncoder::encode(void *inbuf, int insize, uint8_t *outbuf)
 
     mpp_buffer_get(NULL, &buffer, size);
     mpp_packet_init_with_buffer(&m_extra_info, buffer);
-
     mpp_packet_set_length(m_extra_info, 0);
-
+    
     ret = m_mpi->control(m_contex, MPP_ENC_GET_HDR_SYNC, m_extra_info);
-    if (ret)
-    {
+    if (ret) {
         LOG(ERROR, "mpi control enc get header sync failed");
         mpp_packet_deinit(&m_extra_info);
         if (buffer)
