@@ -67,9 +67,6 @@ int RkEncoder::init()
     mpp_enc_cfg_set_s32(cfg, "rc:fps_out_num", m_param.fps);
     mpp_enc_cfg_set_s32(cfg, "rc:fps_out_denom", 1);
 
-    /* setup bitrate for different rc_mode */
-    mpp_enc_cfg_set_s32(cfg, "rc:bps_target", 14400);
-
     mpp_enc_cfg_set_s32(cfg, "prep:width", m_param.width);
     mpp_enc_cfg_set_s32(cfg, "prep:height", m_param.height);
     mpp_enc_cfg_set_s32(cfg, "prep:hor_stride", m_param.hor_stride);
