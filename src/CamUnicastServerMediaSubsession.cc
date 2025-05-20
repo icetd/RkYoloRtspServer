@@ -43,3 +43,76 @@ CamUbicastServerMediaSubsession::createNewRTPSink(Groupsock *rtpGroupsock,
     sink->setPacketSizes(static_cast<unsigned int>(udpDatagramSize_), static_cast<unsigned int>(udpDatagramSize_));
     return sink;
 }
+
+void CamUbicastServerMediaSubsession::getStreamParameters(unsigned clientSessionId,
+                                                          struct sockaddr_storage const &clientAddress,
+                                                          Port const &clientRTPPort,
+                                                          Port const &clientRTCPPort,
+                                                          int tcpSocketNum,
+                                                          unsigned char rtpChannelId,
+                                                          unsigned char rtcpChannelId,
+                                                          TLSState *tlsState,
+                                                          struct sockaddr_storage &destinationAddress,
+                                                          u_int8_t &destinationTTL,
+                                                          Boolean &isMulticast,
+                                                          Port &serverRTPPort,
+                                                          Port &serverRTCPPort,
+                                                          void *&streamToken)
+{
+    char ipStr[INET6_ADDRSTRLEN] = {0};
+
+    if (clientAddress.ss_family == AF_INET) {
+        // IPv4
+        struct sockaddr_in *addr_in = (struct sockaddr_in *)&clientAddress;
+        inet_ntop(AF_INET, &(addr_in->sin_addr), ipStr, sizeof(ipStr));
+    } else if (clientAddress.ss_family == AF_INET6) {
+        // IPv6
+        struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)&clientAddress;
+        inet_ntop(AF_INET6, &(addr_in6->sin6_addr), ipStr, sizeof(ipStr));
+    } else {
+        strcpy(ipStr, "Unknown AF");
+    }
+
+    LOG(NOTICE, "Client connected, sessionId=%u, IP=%s", clientSessionId, ipStr);
+
+    {
+        std::lock_guard<std::mutex> lock(clientIpMutex_);
+        clientIpMap_[clientSessionId] = ipStr;
+    }
+
+    OnDemandServerMediaSubsession::getStreamParameters(clientSessionId,
+                                                       clientAddress,
+                                                       clientRTPPort,
+                                                       clientRTCPPort,
+                                                       tcpSocketNum,
+                                                       rtpChannelId,
+                                                       rtcpChannelId,
+                                                       tlsState,
+                                                       destinationAddress,
+                                                       destinationTTL,
+                                                       isMulticast,
+                                                       serverRTPPort,
+                                                       serverRTCPPort,
+                                                       streamToken);
+}
+
+void CamUbicastServerMediaSubsession::deleteStream(unsigned clientSessionId, void *&streamToken)
+{
+    std::string ip;
+    {
+        std::lock_guard<std::mutex> lock(clientIpMutex_);
+        auto it = clientIpMap_.find(clientSessionId);
+        if (it != clientIpMap_.end()) {
+            ip = it->second;
+            clientIpMap_.erase(it);
+        }
+    }
+
+    if (!ip.empty()) {
+        LOG(NOTICE, "Client disconnected, sessionId=%u, IP=%s", clientSessionId, ip.c_str());
+    } else {
+        LOG(NOTICE, "Client disconnected, sessionId=%u, IP unknown", clientSessionId);
+    }
+
+    OnDemandServerMediaSubsession::deleteStream(clientSessionId, streamToken);
+}
