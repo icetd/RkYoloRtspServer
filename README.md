@@ -97,7 +97,3 @@ v1.0.0 -- single npu && corresponds to rktoolkit 1.5.0 or below
 v1.1.0 -- multiple npu && corresponds to rktoolkit 1.5.0 or below
 v2.0.0 -- multiple npu && corresponds to rktoolkit 1.5.2 or up
 ```
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/chart?repos=icetd/RkYoloRtspServer.git&type=date&logscale&legend=bottom-right)](https://www.star-history.com/?repos=icetd%2FRkYoloRtspServer.git&type=date&logscale=&legend=bottom-right)
